@@ -1,14 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
-#define VALUE1      5
-#define VALUE2      3
-
 void intro332532(int n);
 bool checkprimeornot(int n);
-
-
 
 int main()
 {
@@ -19,12 +13,9 @@ int main()
     scanf("%d", &PosNum);
 
     intro332532(PosNum);
-    
 
     return 0;
 }
-
-
 
 void intro332532(int n)
 {
