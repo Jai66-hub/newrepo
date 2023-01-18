@@ -5,14 +5,24 @@
 
 float *arrayDetails()
 {  
-    int  Inputarr[]= {-8, -23 , 18 , 103 , 0 , 1 , -4  , 631, 3 , -41 , 5 };
+    int *Inputarr = NULL;//[]= {-8, -23 , 18 , 103 , 0 , 1 , -4  , 631, 3 , -41 , 5 };
     float *OutArray = NULL;  
-    int arrSize = 0, minVal =0 , maxVal =0 , minIndex =0, maxIndex =0;
+    int arrSize = 0, arrloop =0 ,minVal =0 , maxVal =0 , minIndex =0, maxIndex =0;
     int sumofArrNumbers = 0 ;
     float meanValue = 0;
     
-    arrSize = ((sizeof(Inputarr)/sizeof(Inputarr[0])));
+    printf("Enter the number of elements for array\n");
+    scanf("%d",&arrSize);
     
+    Inputarr = (int *)malloc(sizeof(Inputarr)* arrSize);
+    
+    printf("Enter the array numbers\n");
+    
+    for(arrloop =0 ; arrloop < arrSize ; arrloop++)
+    {
+        scanf("%d",&Inputarr[arrloop]);
+    }     
+
     OutArray = (float *)malloc(6);
 
     minVal = Inputarr[0];
