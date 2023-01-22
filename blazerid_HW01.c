@@ -4,12 +4,12 @@
 #include <math.h>
 
 
-bool UABNumber(int n);
-float *arrayDetails();
+int UABNumber(int n);
+float *arrayDetails(int *arr,int size);
 void intro332532(int n);
 bool checkprimeornot(int n);
 int reverseNum(int n3);
-int smallerThanIndex();
+int smallerThanIndex(int *numbers,int size);
 
 int main()
 {
@@ -20,6 +20,9 @@ int main()
     int PosNum = 0;
     int  reverseNumber = 0;
     int totalCntValue = 0;
+    int arrSize = 0;
+    int *Inputarr = 0;
+    int arrloop =0;
 
     // UABNumber program
 
@@ -35,10 +38,21 @@ int main()
         printf("\n%d is not UABNumber", Value);
     }
 
- 
     // arrayDetails  program
 
-    OutputArrray = arrayDetails();
+    printf("\n\nEnter the size of array for arrayDetails program\n");
+    scanf("%d",&arrSize);
+
+    Inputarr = (int *)malloc(sizeof(Inputarr)* arrSize);
+
+    printf("Enter the array data elements with space\n");
+
+    for(arrloop =0 ; arrloop < arrSize ; arrloop++)
+    {
+        scanf("%d",&Inputarr[arrloop]);
+    }
+
+    OutputArrray = arrayDetails(Inputarr,arrSize);
 
     for(int i=0; i < 6; i++)
     {
@@ -51,9 +65,9 @@ int main()
 
     intro332532(PosNum);
 
-    Value =0;
 
     // reverseNum program
+    Value =0;
 
     printf("\n\nPlease Enter Positive number for reverseNum program\n") ;
     scanf("%d", &Value);
@@ -66,8 +80,22 @@ int main()
     }
 
     // smallerThanIndex program
+    arrSize = 0;
+    Inputarr = NULL;
 
-    totalCntValue = smallerThanIndex();
+    printf("\n\nEnter the size of array for smallerThanIndex program\n");
+    scanf("%d",&arrSize);
+
+    Inputarr = (int *)malloc(sizeof(int)* arrSize);
+
+    printf("Enter the array numbers with space\n");
+
+    for(arrloop =0 ; arrloop < arrSize ; arrloop++)
+    {
+        scanf("%d",&Inputarr[arrloop]);
+    }
+
+    totalCntValue = smallerThanIndex(Inputarr,arrSize);
 
     printf("TOtal count value is %d\n", totalCntValue);
 
@@ -75,7 +103,7 @@ int main()
     return 0;
 }
 
-bool UABNumber(int n)
+int UABNumber(int n)
 {
     int LoopCnt =0, n2 =0 ,Sum =0;
 
@@ -95,64 +123,51 @@ bool UABNumber(int n)
 
     if (Sum == n2)
     {
-        return true;
+        return 1;
     }
     else
     {
-        return false;
+        return 0;
     }
 
 }
 
-float *arrayDetails()
+float *arrayDetails(int *arr,int size)
 {
-    int *Inputarr = NULL;//[]= {-8, -23 , 18 , 103 , 0 , 1 , -4  , 631, 3 , -41 , 5 };
-    float *OutArray = NULL;
-    int arrSize = 0, arrloop =0 ,minVal =0 , maxVal =0 , minIndex =0, maxIndex =0;
-    int sumofArrNumbers = 0 ;
-    float meanValue = 0;
+    float       *OutArray = NULL;
+    int         minVal =0 , maxVal =0 , minIndex =0, maxIndex =0;
+    int         sumofArrNumbers = 0 ;
+    float       meanValue = 0;
 
-    printf("\n\nEnter the number of elements for array for arrayDetails program\n");
-    scanf("%d",&arrSize);
-
-    Inputarr = (int *)malloc(sizeof(Inputarr)* arrSize);
-
-    printf("Enter the array numbers\n");
-
-    for(arrloop =0 ; arrloop < arrSize ; arrloop++)
-    {
-        scanf("%d",&Inputarr[arrloop]);
-    }
 
     OutArray = (float *)malloc(6);
 
-    minVal = Inputarr[0];
-    maxVal = Inputarr[0];
+    minVal = arr[0];
+    maxVal = arr[0];
 
-    for(int  loop =1 ; loop < arrSize; loop++)
+    for(int  loop =1 ; loop < size; loop++)
     {
-        if(Inputarr[loop] > maxVal)
+        if(arr[loop] > maxVal)
         {
-            maxVal = Inputarr[loop];
+            maxVal = arr[loop];
             maxIndex = loop;
         }
 
-        if(Inputarr[loop] < minVal)
+        if(arr[loop] < minVal)
         {
-            minVal = Inputarr[loop];
+            minVal = arr[loop];
             minIndex = loop;
         }
     }
 
     //finding mean
-    for(int meanloop = 0; meanloop < arrSize; meanloop++)
+    for(int meanloop = 0; meanloop < size; meanloop++)
     {
-      sumofArrNumbers += Inputarr[meanloop];
+      sumofArrNumbers += arr[meanloop];
     }
+    meanValue = sumofArrNumbers / (float)size;
 
-    meanValue = sumofArrNumbers / (float)arrSize;
-
-    OutArray[0] = arrSize;
+    OutArray[0] = size;
     OutArray[1] = minVal;
     OutArray[2] = minIndex;
     OutArray[3] = meanValue;
@@ -244,25 +259,13 @@ int reverseNum(int n3)
     return revOrderNum;
 }
 
-int smallerThanIndex()
+int smallerThanIndex(int *numbers,int size)
 {
-    int arrSize = 0, arrloop =0, totalCnt =0;
-    int *arr = NULL;
-    printf("\n\nEnter the number of elements for array for smallerThanIndex program\n");
-    scanf("%d",&arrSize);
+    int arrloop =0, totalCnt =0;
 
-    arr = (int *)malloc(sizeof(int)* arrSize);
-
-    printf("Enter the array numbers\n");
-
-    for(arrloop =0 ; arrloop < arrSize ; arrloop++)
+    for(arrloop =0; arrloop < size; arrloop++)
     {
-        scanf("%d",&arr[arrloop]);
-    }
-
-    for(arrloop =0; arrloop < arrSize; arrloop++)
-    {
-        if((*(arr + arrloop)) < arrloop)
+        if((*(numbers + arrloop)) < arrloop)
         {
             totalCnt++;
         }
@@ -270,7 +273,3 @@ int smallerThanIndex()
 
     return totalCnt;
 }
-
-  
-  
-  
