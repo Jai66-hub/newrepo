@@ -1,15 +1,4 @@
-1. To compile program run "cc insertionsort.c" command.
-2. To run the program run " ./a.out " command.
-3. Then Give the input elements to the array and enter.
-   below is show as an example .
-
-Eg:-  Output of program
-
-Enter the size of the array
-5
-Enter the array elements
-7 1 3 97 7
-Unsorted array
-7 1 3 97 7
-Sorted array
-1 3 7 7 97
+1. Create two files with some data in them 
+2 To compile program run "cc -o lab04 lab4.c" command.
+3. To run the program run " ./lab04 file1.txt file2.txt " command.
+4. check both the files data.
