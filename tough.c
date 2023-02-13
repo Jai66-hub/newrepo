@@ -9,26 +9,28 @@
 #include <time.h>
 
 int printDirList(char *path,int optionSel);
-int checkDirorNot(char *path);
 int getsizeoffile(char *filename);
 char* getfilepermissions(char *filepath);
 char *getlastaccesstime(char *filepath);
 
 // global variables
 
-char    gfilestr[50];
+char    gfilestr[20];
 int     gdepth                  = 0;
 int     gfilesize               = 0;
 bool    gsmallsEnab             = false;
 bool    gbigSEnab               = false;
 bool    gsmallFEnab             = false;
 bool    gsmalltEnb              = false;
-char    gstrtoption[50];
+char    gstrtoption[10];
+int     gfileselection          = 0; // 1 - dir , 2 - regular files
 
 int main(int argc,char **argv)
 {
 
         int     option                  = 0;
+        char    strtoption[10];
+        int     (*printDirFuncPtr)(char *,int);
 
         while((option = getopt(argc, argv, "Ss:t:f:")) != -1)
         {
@@ -49,14 +51,12 @@ int main(int argc,char **argv)
                                 gsmallFEnab = true;
                                 break;
                         case 't':
-                                strcpy(gstrtoption,optarg);
+                                strcpy(strtoption,optarg);
                                 gsmalltEnb = true;
                                 break;
                 }
         }
 
-
-        printf("optiin val :%d\n",optind);
         if(optind < argc)
         {
                 if(gsmallFEnab)
@@ -66,25 +66,25 @@ int main(int argc,char **argv)
                 }
         }
 
-        printf("optiin val :%d\n",optind);
+        if(gsmalltEnb)
+        {
+                if(strcmp(strtoption,"d")==0)
+                        gfileselection = 1;
+                else
+                        gfileselection = 2;
+        }
 
+        // simple use of function pointer
+        printDirFuncPtr = printDirList;
+
+        // calling printDirList funciton over a function pointer
         if(argv[optind] == NULL)
-                printDirList(".",0);
+                printDirFuncPtr(".",0);
         else
-                printDirList(argv[optind],0);
+                printDirFuncPtr(argv[optind],0);
 
 
         return 0;
-}
-
-int checkDirorNot(char *filename)
-{
-        int size = 0;
-        struct stat checkfordir;
-
-        stat(filename, &checkfordir);
-
-        return S_ISREG(checkfordir.st_mode);
 }
 
 int getsizeoffile(char *filename)
@@ -98,6 +98,7 @@ int getsizeoffile(char *filename)
 
         return size;
 }
+
 
 char* getfilepermissions(char *filepath)
 {
@@ -130,10 +131,7 @@ char *getlastaccesstime(char *filepath)
 {
         struct stat st;
         char *lastacctime = malloc(sizeof(char) * 32);
-
         strftime(lastacctime, 32, "%d-%m-%Y %H:%M:%S", localtime(&st.st_atime));
-//      strftime(time, 50, "%Y-%m-%d %H:%M:%S", localtime(&attrib.st_mtime));
-
         return lastacctime;
 }
 
@@ -142,21 +140,14 @@ int printDirList(char *path,int optionSel)
 
         struct dirent *files;
         DIR *dir = NULL;
-
         char *fullpath = NULL;
         int pathlen = 0;
-        char formatstrs[50] = {0};
         char formatstrS[256]= {0};
-        char formatstrf[256]= {0};
-        char fullinfo[500]= {0};
         int filesize = 0;
         int retVal =0;
         char *fileperm = NULL;
         char *lastaccesstime =NULL;
         char *substr = NULL;
-
-
-//      printf("received path %s\n",path);
 
         dir = opendir(path);
         if (dir == NULL)
@@ -167,9 +158,10 @@ int printDirList(char *path,int optionSel)
         pathlen = strlen(path);
 
         fullpath = (char *)malloc((pathlen*2));
-        
+
         if(optionSel ==0)
                 printf("%s\n",path);
+
 
         while ((files = readdir(dir)) != NULL)
         {
@@ -193,11 +185,62 @@ int printDirList(char *path,int optionSel)
 
                 }
 
-                if(gsmallFEnab & gsmallsEnab)
+                if(gsmalltEnb && gsmallFEnab && gsmallsEnab)
+                {
+                        substr = strstr(files->d_name,gfilestr);
+
+                        if((filesize  <= gfilesize) && (substr !=NULL))
+                        {
+                                if(gfileselection == 1)
+                                {
+                                        if(files->d_type == DT_DIR)
+                                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                }
+                                else if(gfileselection == 2)
+                                {
+                                        if(files->d_type != DT_DIR)
+                                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                }
+                        }
+                }
+                else if(gsmallFEnab && gsmallsEnab)
                 {
                         substr = strstr(files->d_name,gfilestr);
                         if((files->d_type != DT_DIR) && (filesize  <= gfilesize) && (substr !=NULL))
-                                 printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                }
+                else if(gsmallFEnab && gsmalltEnb)
+                {
+                        substr = strstr(files->d_name,gfilestr);
+                        if((substr !=NULL))
+                        {
+                                if(gfileselection == 1)
+                                {
+                                        if(files->d_type == DT_DIR)
+                                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                }
+                                else if(gfileselection == 2)
+                                {
+                                        if(files->d_type != DT_DIR)
+                                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                }
+                        }
+                }
+                else if(gsmalltEnb && gsmallsEnab)
+                {
+                        if((filesize  <= gfilesize))
+                        {
+                                if(gfileselection == 1)
+                                {
+                                        if(files->d_type == DT_DIR)
+                                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                }
+                                else if(gfileselection == 2)
+                                {
+                                        if(files->d_type != DT_DIR)
+                                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                                }
+                        }
                 }
                 else if(gsmallsEnab)
                 {
@@ -210,9 +253,22 @@ int printDirList(char *path,int optionSel)
                         if(substr !=NULL)
                                 printf("\t%s   \t%s\n", files->d_name,formatstrS);
                 }
+                else if(gsmalltEnb)
+                {
+                        if(gfileselection == 1)
+                        {
+                                if(files->d_type == DT_DIR)
+                                        printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                        }
+                        else if(gfileselection == 2)
+                        {
+                                if(files->d_type != DT_DIR)
+                                        printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                        }
+                }
                 else
                 {
-                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                        printf("\t%s   \t%s\n", files->d_name,formatstrS);
                 }
 
                 memset(formatstrS,'\0',sizeof(formatstrS));
@@ -226,4 +282,3 @@ int printDirList(char *path,int optionSel)
         closedir(dir);
         return 0;
 }
-                        
