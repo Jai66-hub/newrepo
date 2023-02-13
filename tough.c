@@ -16,32 +16,21 @@ char *getlastaccesstime(char *filepath);
 
 // global variables
 
-char    gstr[50];
-int     gdepth          = 0;
-int     gfilesize       = 0;
+char    gfilestr[50];
+int     gdepth                  = 0;
+int     gfilesize               = 0;
 bool    gsmallsEnab             = false;
-bool    gbigSEnab                = false;
+bool    gbigSEnab               = false;
 bool    gsmallFEnab             = false;
+bool    gsmalltEnb              = false;
+char    gstrtoption[50];
 
 int main(int argc,char **argv)
 {
 
-
         int     option                  = 0;
-        int     fileIndex               = 0;
-        int     argIndex                = 0;
-        int     Val                     = 0;
-        int     depth                   = 0;
-        bool    fileNameprovided        = false;
-        bool    smallsEnab              = false;
-        bool    bigSEnab                = false;
-        bool    isFirstParam            = false;
-        int     loop                    = 1;
-        char    str[50];
 
-
-
-        while((option = getopt(argc, argv, ":Ssf")) != -1)
+        while((option = getopt(argc, argv, "Ss:t:f:")) != -1)
         {
 
                 switch(option)
@@ -50,49 +39,43 @@ int main(int argc,char **argv)
                                 gbigSEnab = true;
                                 break;
                         case 's':
-                                if(loop == 1)
-                                        gfilesize = atoi(argv[loop+1]);
-                                else if(loop == 2)
-                                        gfilesize = atoi(argv[loop+3]);
-                                else if(loop == 3)
-                                        gfilesize = atoi(argv[loop+3]);
+                                gfilesize = atoi(optarg);
 
                                 gsmallsEnab = true;
                                 break;
                         case 'f':
-                                if(loop == 1)
-                                {
-                                        strcpy(gstr,argv[loop+1]);
-                                        gdepth = atoi(argv[loop+2]);
-                                }
-                                else if(loop == 2)
-                                {
-                                        strcpy(gstr,argv[loop+2]);
-                                        gdepth = atoi(argv[loop+3]);
-                                }
-                                else
-                                {
-                                        strcpy(gstr,argv[loop+2]);
-                                        gdepth = atoi(argv[loop+3]);
-                                }
+                                strcpy(gfilestr,optarg);
 
                                 gsmallFEnab = true;
                                 break;
+                        case 't':
+                                strcpy(gstrtoption,optarg);
+                                gsmalltEnb = true;
+                                break;
                 }
-                loop++;
-
         }
 
-        while(optind < argc)
-                optind++;
 
-        optind -= 1;
+        printf("optiin val :%d\n",optind);
+        if(optind < argc)
+        {
+                if(gsmallFEnab)
+                {
+                        gdepth = atoi(argv[optind]);
+                        optind++;
+                }
+        }
 
-        printDirList(argv[optind],0);
+        printf("optiin val :%d\n",optind);
+
+        if(argv[optind] == NULL)
+                printDirList(".",0);
+        else
+                printDirList(argv[optind],0);
+
 
         return 0;
 }
-
 
 int checkDirorNot(char *filename)
 {
@@ -148,7 +131,8 @@ char *getlastaccesstime(char *filepath)
         struct stat st;
         char *lastacctime = malloc(sizeof(char) * 32);
 
-        strftime(lastacctime, 32, "%c", localtime(&st.st_atime));
+        strftime(lastacctime, 32, "%d-%m-%Y %H:%M:%S", localtime(&st.st_atime));
+//      strftime(time, 50, "%Y-%m-%d %H:%M:%S", localtime(&attrib.st_mtime));
 
         return lastacctime;
 }
@@ -161,17 +145,18 @@ int printDirList(char *path,int optionSel)
 
         char *fullpath = NULL;
         int pathlen = 0;
-        char formatstrs[50];
-        char formatstrS[256];
-        char formatstrf[256];
-        char fullinfo[500];
+        char formatstrs[50] = {0};
+        char formatstrS[256]= {0};
+        char formatstrf[256]= {0};
+        char fullinfo[500]= {0};
         int filesize = 0;
         int retVal =0;
         char *fileperm = NULL;
         char *lastaccesstime =NULL;
+        char *substr = NULL;
 
-        if(path == NULL)
-                strcpy(path,".");
+
+//      printf("received path %s\n",path);
 
         dir = opendir(path);
         if (dir == NULL)
@@ -182,7 +167,7 @@ int printDirList(char *path,int optionSel)
         pathlen = strlen(path);
 
         fullpath = (char *)malloc((pathlen*2));
-
+        
         if(optionSel ==0)
                 printf("%s\n",path);
 
@@ -208,22 +193,29 @@ int printDirList(char *path,int optionSel)
 
                 }
 
-                if(gsmallFEnab)
+                if(gsmallFEnab & gsmallsEnab)
                 {
-
+                        substr = strstr(files->d_name,gfilestr);
+                        if((files->d_type != DT_DIR) && (filesize  <= gfilesize) && (substr !=NULL))
+                                 printf("\t%s   \t%s\n", files->d_name,formatstrS);
                 }
-                if(gsmallsEnab)
+                else if(gsmallsEnab)
                 {
-                        filesize = getsizeoffile(fullpath);
                         if((files->d_type != DT_DIR) && (filesize  <= gfilesize))
-                        {
-                                printf("\t%s   %s\n", files->d_name,formatstrS);
-                        }
+                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
+                }
+                else if(gsmallFEnab)
+                {
+                        substr = strstr(files->d_name,gfilestr);
+                        if(substr !=NULL)
+                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
                 }
                 else
                 {
-                        printf("\t%s   %s\n", files->d_name,formatstrS);
+                                printf("\t%s   \t%s\n", files->d_name,formatstrS);
                 }
+
+                memset(formatstrS,'\0',sizeof(formatstrS));
 
                 printDirList(fullpath,1);
 
@@ -234,3 +226,4 @@ int printDirList(char *path,int optionSel)
         closedir(dir);
         return 0;
 }
+                        
