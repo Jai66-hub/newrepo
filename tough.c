@@ -209,7 +209,7 @@ int printDirList(char *path,int optionSel)
                         if(checksymbolfileornot(files->d_name))
                         {
                                 symbfile = getsymbolfilename(files->d_name);
-                                sprintf(symbolfilename,"-> %s",symbfile);
+                                sprintf(symbolfilename,"(%s)",symbfile);
                         }
                 }
 
