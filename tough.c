@@ -1,3 +1,10 @@
+/*
+Name:
+Blazer ID:
+Project #:
+To Compile: run the 'make' command in terminal to compile the program
+To run:   run using the object file --   eg:-  " ./search -s 1024 " or " ./search -f ead 1 projects " etc.
+*/
 #include <stdio.h>
 #include <dirent.h>
 #include <stdbool.h>
@@ -61,6 +68,7 @@ int main(int argc,char **argv)
 
         if(optind < argc)
         {
+                // get the depth argument if -f option paramter is selected 
                 if(gsmallFEnab)
                 {
                         gdepth = atoi(argv[optind]);
@@ -68,6 +76,7 @@ int main(int argc,char **argv)
                 }
         }
 
+        // get the -t argument and enable flag 
         if(gsmalltEnb)
         {
                 if(strcmp(strtoption,"d")==0)
@@ -76,6 +85,7 @@ int main(int argc,char **argv)
                         gfileselection = 2;
         }
 
+        // used for tab indentation logic 
         gTabIndCnt = 1;
 
         // simple use of function pointer
@@ -91,6 +101,8 @@ int main(int argc,char **argv)
         return 0;
 }
 
+
+// get the size of file
 int getsizeoffile(char *filename)
 {
         int size = 0;
@@ -103,6 +115,7 @@ int getsizeoffile(char *filename)
         return size;
 }
 
+// get the file permissions 
 char* getfilepermissions(char *filepath)
 {
         struct stat st;
@@ -130,6 +143,7 @@ char* getfilepermissions(char *filepath)
 
 }
 
+// get the last access time of a file 
 char *getlastaccesstime(char *filepath)
 {
         struct stat st;
@@ -138,6 +152,7 @@ char *getlastaccesstime(char *filepath)
         return lastacctime;
 }
 
+// To check whether provided file is having symbolic link or not 
 bool checksymbolfileornot(char *filename)
 {
         struct stat st;
@@ -149,6 +164,7 @@ bool checksymbolfileornot(char *filename)
                 return false;
 }
 
+// To get the filename of the which it is being redirected by symbolic link file 
 char *getsymbolfilename(char *filename)
 {
         char *symbfilename = malloc(sizeof(char) * 100);
@@ -161,6 +177,7 @@ char *getsymbolfilename(char *filename)
         return symbfilename;
 }
 
+// A whole operational program for printing the directories/files list as per the optional arguments passed 
 int printDirList(char *path,int optionSel)
 {
 
