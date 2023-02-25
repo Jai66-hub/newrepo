@@ -124,7 +124,7 @@ int sortPrice(const void *PrevVal, const void *NxtVal)
 {
 	const Slist *list1 = (Slist *)PrevVal;
 	const Slist *list2 = (Slist *)NxtVal;
-	return ((list2->price) - (list1->price));
+	return ((list1->price) - (list2->price));
 }
 
 void sortByHostName(Slist *list, int listCnt)
