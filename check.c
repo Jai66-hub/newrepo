@@ -17,9 +17,10 @@ int main(int argc, char **argv)
 	FILE	*Ipfp = NULL;
 	FILE	*OPfp = NULL;
 	time_t	beginTime, endTime;
-	char	argumnets[10][250] = { 0 };
+	char	*argumnets[250];
 	char	*args = NULL;
 	int	argcnt = 0;
+
 
 	Ipfp = fopen(argv[1], "r");
 
@@ -41,32 +42,31 @@ int main(int argc, char **argv)
 
 	while (fgets(data, 250, Ipfp) != NULL)
 	{
-		strcpy(command, data);
+	        data[strlen(data) - 1] = '\0';
+	        strcpy(command, data);
 		argcnt = 0;
-		memset(argumnets, 0, sizeof argumnets);
-		args = strtok(command, " ");
-		strcpy(argumnets[argcnt], args);
+		args = strtok(data," ");
+                argumnets[0] = args;
 		while (args != NULL)
 		{
-			args = strtok(NULL, " ");
+			args = strtok(NULL," ");
 			argcnt++;
 			if(args != NULL)
-				strcpy(argumnets[argcnt], args);
-		}
-
+			{
+                           argumnets[argcnt] = args;
+		        }
+		}	
+                argumnets[argcnt] = NULL;              
 		beginTime = time(NULL);
 		ChildPid = fork();
-
 		if (ChildPid == 0)
 		{
-			printf("this is child\n");
-			execvp(argumnets[0], argumnets);
+		 	execvp(argumnets[0], argumnets);
 			exit(0);
 		}
 		else if (ChildPid > 0)
 		{
-			printf("this is parent\n");
-			waitpid(ChildPid, &ChildStatus);
+			waitpid(ChildPid, &ChildStatus,0);
 			endTime = time(NULL);
 			if (WIFEXITED(ChildStatus))
 			{
